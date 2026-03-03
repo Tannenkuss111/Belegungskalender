@@ -1,0 +1,79 @@
+
+:root {
+  --accent:#0a7ea4;
+  --blocked:#ff6b6b;
+  --free:#e8f6f9;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background:#f3f3f3;
+  margin:0;
+  padding:0;
+  color:#222;
+}
+
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0 0 12px rgba(0,0,0,.1);
+}
+
+h1 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.month {
+  margin: 20px 0;
+}
+
+.month h2 {
+  margin-bottom:8px;
+  color:var(--accent);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.weekday, .day {
+  padding: 10px;
+  text-align:center;
+  border-radius: 8px;
+}
+
+.weekday {
+  background:#eee;
+  font-weight:bold;
+}
+
+.day.free {
+  background: var(--free);
+}
+
+.day.blocked {
+  background: var(--blocked);
+  color:#fff;
+}
+
+.legend {
+  margin-top:10px;
+  text-align:center;
+  font-size:0.9rem;
+}
+
+.legend span {
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border-radius:3px;
+  margin-right:6px;
+}
+.legend .free { background: var(--free); border:1px solid #b8e4ee; }
+.legend .blocked { background: var(--blocked); }
