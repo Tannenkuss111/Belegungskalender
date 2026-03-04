@@ -63,15 +63,34 @@
       <button type="submit">Absenden / Send</button>
     </form>
 
+   
     <!-- QR-Code -->
     <h2>QR‑Code</h2>
-    <img
-      src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender"
-      alt="QR-Code zum Belegungskalender"
-      width="250" height="250" loading="lazy">
-  </main>
+
+    <div class="qr-section">
+      <!-- QR-Code Bild -->
+      <div class="qr-img">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender"
+          alt="QR‑Code – Belegungskalender TANNENKUSS111"
+          width="250" height="250" loading="lazy">
+      </div>
+
+      <!-- Logo + Anschrift -->
+      <div class="qr-info">
+        <img src="tkus111.jpg?v=3" alt="TANNENKUSS111 Logo" class="logo-small" loading="lazy">
+        <p class="address">
+          <strong>Ferienpark Hahnenklee</strong><br>
+          Tannenkuss111<br>
+          Am Hahnenkleer Berg&nbsp;7<br>
+          38644&nbsp;Goslar
+        </p>
+      </div>
+    </div>
+
 
   <!-- Immer aktuelles JS laden -->
   <script src="calendar.js?v=3"></script>
 </body>
 </html>
+
