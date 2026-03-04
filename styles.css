@@ -176,3 +176,41 @@ button:hover {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+
+/* --- QR + Logo + Adresse nebeneinander --- */
+.qr-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;            /* bricht auf kleineren Bildschirmen um */
+  margin-top: 10px;
+}
+
+.qr-img img {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  background: #fff;
+}
+
+.qr-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 260px;            /* erlaubt Umbruch auf kleineren Screens */
+}
+
+.logo-small {
+  max-width: 140px;
+  height: auto;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+  border-radius: 6px;
+}
+
+.address {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.98rem;
+  color: #222;
+}
+
