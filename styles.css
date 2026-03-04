@@ -214,3 +214,27 @@ button:hover {
   color: #222;
 }
 
+
+/* --- Auswahl-Styles für Klickauswahl --- */
+.day.free { cursor: pointer; }
+.day.free:hover { filter: brightness(0.98); }
+
+.day.sel-start,
+.day.sel-end {
+  outline: 2px solid var(--gold);
+  box-shadow: 0 0 0 2px var(--gold) inset;
+}
+
+.day.sel-inrange {
+  background: #dff0e5;              /* leicht dunkler als --free */
+  border-color: #9cc7a8 !important;
+}
+
+#selection-message {
+  text-align: center;
+  margin: 8px 0 12px;
+  font-size: .95rem;
+  color: var(--accent);
+}
+#selection-message.error { color: #b33a3a; }
+
