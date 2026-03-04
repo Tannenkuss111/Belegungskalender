@@ -127,9 +127,7 @@ h1 {
   border: 1px solid #b8d7c0;
   cursor: pointer;
 }
-.day.free:hover {
-  filter: brightness(0.98);
-}
+.day.free:hover { filter: brightness(0.98); }
 
 /* Markierungen für Auswahl */
 .day.sel-start,
@@ -142,7 +140,7 @@ h1 {
   border-color: #9cc7a8 !important;
 }
 
-/* Badges für An-/Abreise (kleine Ecken mit A/E) */
+/* Badges für An-/Abreise */
 .day.sel-start::after,
 .day.sel-end::after {
   content: attr(data-badge);
