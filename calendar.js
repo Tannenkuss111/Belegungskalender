@@ -1,5 +1,8 @@
 
-const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const LANG = navigator.language.startsWith("de") ? "de-DE" : "en-US";
+const WEEKDAYS = LANG === "de-DE"
+  ? ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+  : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 async function loadBlocked() {
   const res = await fetch("blocked.json");
@@ -16,7 +19,7 @@ function renderMonth(container, year, month, blocks) {
   section.className = "month";
 
   const title = document.createElement("h2");
-  title.textContent = new Date(year, month).toLocaleString("de-DE", {
+  title.textContent = new Date(year, month).toLocaleString(LANG, {
     month: "long", year: "numeric"
   });
   section.appendChild(title);
@@ -63,3 +66,4 @@ function renderMonth(container, year, month, blocks) {
     renderMonth(container, d.getFullYear(), d.getMonth(), blocks);
   }
 })();
+
