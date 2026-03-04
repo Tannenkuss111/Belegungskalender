@@ -6,7 +6,6 @@
   --blocked: #b33a3a;
   --free: #e9f7ef;
   --bg: #f3f3f3;
-  --success: #28a745;       /* Grün für Erfolg */
 }
 
 body {
@@ -178,55 +177,6 @@ h1 {
 .legend .free { background: var(--free); border: 1px solid #b8d7c0; }
 .legend .blocked { background: var(--blocked); }
 
-/* SUCCESS FEEDBACK (NEU) */
-.success-feedback {
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-  border: 2px solid var(--success);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  color: #155724;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  animation: slideInUp 0.4s ease-out forwards;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
-}
-
-.success-icon {
-  font-size: 2rem;
-  animation: bounce 0.6s ease-in-out;
-}
-
-.success-text {
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.success-text strong {
-  font-size: 1.1rem;
-  color: var(--success);
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
 /* Formular */
 form {
   background: #fff;
@@ -242,7 +192,6 @@ form input, form textarea {
   margin: 6px 0 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  box-sizing: border-box;
 }
 
 /* Button */
@@ -300,24 +249,4 @@ button:hover {
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Info / Error Messages */
-.info {
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.info.info {
-  background: #d1ecf1;
-  border: 1px solid #bee5eb;
-  color: #0c5460;
-}
-
-.info.error {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
 }
