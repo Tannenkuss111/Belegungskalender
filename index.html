@@ -4,18 +4,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Belegungskalender</title>
+  <title>TANNENKUSS111 – Belegungskalender</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <main class="container">
-    <h1>Belegungskalender – Ferienwohnung</h1>
+
+    <h1>Ferienwohnung TANNENKUSS111</h1>
+    <p class="subtitle">Belegungskalender – Availability Calendar</p>
+
+    <!-- Hinweisbox -->
+    <div class="notice">
+      🟩 Grün = frei — 🟥 Rot = belegt  
+      <br>Green = available — Red = booked
+    </div>
+
+    <!-- Kalender -->
     <div id="calendar"></div>
 
     <p class="legend">
-      <span class="free"></span> frei &nbsp;&nbsp;
-      <span class="blocked"></span> belegt
+      <span class="free"></span> frei / available &nbsp;&nbsp;
+      <span class="blocked"></span> belegt / booked
     </p>
+
+    <!-- Anfrageformular -->
+    <h2>Anfrage senden – Send Inquiry</h2>
+    <form action="https://formsubmit.co/play8282@gmx.de" method="POST">
+
+      <label>Name / Name</label>
+      <input type="text" name="name" required>
+
+      <label>E-Mail / Email</label>
+      <input type="email" name="email" required>
+
+      <label>Anreise / Arrival</label>
+      <input type="date" name="arrival" required>
+
+      <label>Abreise / Departure</label>
+      <input type="date" name="departure" required>
+
+      <label>Nachricht / Message</label>
+      <textarea name="message" rows="4"></textarea>
+
+      <button type="submit">Absenden / Send</button>
+
+      <!-- Anti-Spam -->
+      <input type="hidden" name="_captcha" value="false">
+    </form>
+
+    <!-- QR-Code -->
+    <h2>QR-Code</h2>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://tannenkuss111.github.io/Belegungskalender" alt="QR Code">
+
   </main>
 
   <script src="calendar.js"></script>
