@@ -47,7 +47,7 @@ h1 {
   color: white;
   padding: 15px;
   border-radius: 10px;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
   text-align: center;
   font-size: 1rem;
   border-left: 5px solid var(--gold);
@@ -57,6 +57,20 @@ h1 {
   color: var(--gold);
   font-weight: 700;
 }
+
+/* Zum aktuellen Monat springen */
+.jump {
+  text-align: center;
+  margin: 8px 0 14px;
+}
+.jump a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 2px;
+}
+.jump a:hover { color: var(--accent-light); }
 
 /* ===== Logo / Brand ===== */
 .brand {
@@ -101,6 +115,7 @@ h1 {
   border-radius: 8px;
   font-size: 0.95rem;
 }
+.day { position: relative; }   /* für Badge-Positionierung */
 
 .weekday {
   background: #eee;
@@ -110,8 +125,39 @@ h1 {
 .day.free {
   background: var(--free);
   border: 1px solid #b8d7c0;
+  cursor: pointer;
+}
+.day.free:hover {
+  filter: brightness(0.98);
 }
 
+/* Markierungen für Auswahl */
+.day.sel-start,
+.day.sel-end {
+  outline: 2px solid var(--gold);
+  box-shadow: 0 0 0 2px var(--gold) inset;
+}
+.day.sel-inrange {
+  background: #dff0e5;
+  border-color: #9cc7a8 !important;
+}
+
+/* Badges für An-/Abreise (kleine Ecken mit A/E) */
+.day.sel-start::after,
+.day.sel-end::after {
+  content: attr(data-badge);
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background: var(--gold);
+  color: #222;
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 1px 4px;
+  border-radius: 10px;
+}
+
+/* Blockierte Tage */
 .day.blocked {
   background: var(--blocked);
   color: white;
@@ -123,7 +169,6 @@ h1 {
   text-align: center;
   font-size: 0.9rem;
 }
-
 .legend span {
   display: inline-block;
   width: 14px;
@@ -131,7 +176,6 @@ h1 {
   border-radius: 3px;
   margin-right: 6px;
 }
-
 .legend .free { background: var(--free); border: 1px solid #b8d7c0; }
 .legend .blocked { background: var(--blocked); }
 
@@ -171,42 +215,31 @@ button:hover {
   box-shadow: 0 4px 10px rgba(0,0,0,.08);
 }
 
-/* Animationen */
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-
-/* --- QR + Logo + Adresse nebeneinander --- */
+/* QR + Logo + Adresse nebeneinander */
 .qr-section {
   display: flex;
   gap: 20px;
   align-items: center;
-  flex-wrap: wrap;            /* bricht auf kleineren Bildschirmen um */
+  flex-wrap: wrap;
   margin-top: 10px;
 }
-
 .qr-img img {
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,.08);
   background: #fff;
 }
-
 .qr-info {
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: 1 1 260px;            /* erlaubt Umbruch auf kleineren Screens */
+  flex: 1 1 260px;
 }
-
 .logo-small {
   max-width: 140px;
   height: auto;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
   border-radius: 6px;
 }
-
 .address {
   margin: 0;
   line-height: 1.4;
@@ -214,27 +247,8 @@ button:hover {
   color: #222;
 }
 
-
-/* --- Auswahl-Styles für Klickauswahl --- */
-.day.free { cursor: pointer; }
-.day.free:hover { filter: brightness(0.98); }
-
-.day.sel-start,
-.day.sel-end {
-  outline: 2px solid var(--gold);
-  box-shadow: 0 0 0 2px var(--gold) inset;
+/* Animationen */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-.day.sel-inrange {
-  background: #dff0e5;              /* leicht dunkler als --free */
-  border-color: #9cc7a8 !important;
-}
-
-#selection-message {
-  text-align: center;
-  margin: 8px 0 12px;
-  font-size: .95rem;
-  color: var(--accent);
-}
-#selection-message.error { color: #b33a3a; }
-
