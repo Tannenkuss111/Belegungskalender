@@ -5,25 +5,64 @@ const WEEKDAYS = LANG === "de-DE"
   ? ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
   : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-// Belegte Zeiträume laden (immer frisch, mit Cache-Bust)
+// Einstellungen
+const MIN_NIGHTS = 2;
+
+// -- Hilfsfunktionen --
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function toISO(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function parseISO(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function daysDiff(a, b) {
+  // Differenz in vollen Tagen
+  const a0 = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+  const b0 = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((b0 - a0) / MS_PER_DAY);
+}
+function enumerateDates(start, end) {
+  const out = [];
+  let cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  while (cur <= last) {
+    out.push(new Date(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return out;
+}
+
+// Blocked-Ranges laden (immer frisch, mit Cache-Bust)
 async function loadBlocked() {
-  const res = await fetch("blocked.json?v=3", { cache: "no-store" });
-  const data = await res.json();
-  return data.ranges.map(r => [new Date(r.start), new Date(r.end)]);
+  const res = await fetch("blocked.json?v=5", { cache: "no-store" });
+  const data = await res.json(); // { ranges: [{start, end}, ...] }
+  // in Date-Objekte umwandeln
+  return data.ranges.map(r => [parseISO(r.start), parseISO(r.end)]);
 }
 
 function isBlocked(date, blocks) {
   return blocks.some(([s, e]) => date >= s && date <= e);
 }
 
-function renderMonth(container, year, month, blocks) {
+function pathHasBlocked(start, end, blocks) {
+  // Prüfe alle Tage im Bereich inkl. Start/Ende
+  const dates = enumerateDates(start, end);
+  return dates.some(d => isBlocked(d, blocks));
+}
+
+// -- Rendering --
+function renderMonth(container, year, month, blocks, onDayClick) {
   const section = document.createElement("section");
   section.className = "month";
 
   const title = document.createElement("h2");
-  title.textContent = new Date(year, month).toLocaleString(LANG, {
-    month: "long", year: "numeric"
-  });
+  title.textContent = new Date(year, month).toLocaleString(LANG, { month: "long", year: "numeric" });
   section.appendChild(title);
 
   const grid = document.createElement("div");
@@ -38,17 +77,32 @@ function renderMonth(container, year, month, blocks) {
 
   const first = new Date(year, month, 1);
   const last = new Date(year, month + 1, 0);
-  const offset = (first.getDay() + 6) % 7; // Mo=0 ... So=6
+  const offset = (first.getDay() + 6) % 7; // Montag=0
 
-  for (let i = 0; i < offset; i++) {
-    grid.appendChild(document.createElement("div"));
-  }
+  for (let i = 0; i < offset; i++) grid.appendChild(document.createElement("div"));
 
   for (let d = 1; d <= last.getDate(); d++) {
     const date = new Date(year, month, d);
     const cell = document.createElement("div");
-    cell.className = "day " + (isBlocked(date, blocks) ? "blocked" : "free");
+    const blocked = isBlocked(date, blocks);
+    cell.className = "day " + (blocked ? "blocked" : "free");
     cell.textContent = d;
+    cell.dataset.date = toISO(date);
+
+    if (!blocked) {
+      cell.tabIndex = 0;
+      cell.setAttribute("role", "button");
+      cell.setAttribute("aria-label", (LANG==="de-DE" ? "Datum auswählen " : "Select date ") + cell.dataset.date);
+      cell.addEventListener("click", () => onDayClick(cell.dataset.date));
+      cell.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onDayClick(cell.dataset.date);
+        }
+      });
+    } else {
+      cell.setAttribute("aria-disabled", "true");
+    }
     grid.appendChild(cell);
   }
 
@@ -56,33 +110,170 @@ function renderMonth(container, year, month, blocks) {
   container.appendChild(section);
 }
 
+// -- Auswahl-Visualisierung --
+function clearSelectionVisual() {
+  document.querySelectorAll(".day.sel-start, .day.sel-end, .day.sel-inrange").forEach(el => {
+    el.classList.remove("sel-start", "sel-end", "sel-inrange");
+  });
+}
+
+function applySelectionVisual(startISO, endISO) {
+  clearSelectionVisual();
+  if (!startISO) return;
+
+  const allDays = Array.from(document.querySelectorAll(".day.free, .day.blocked"));
+  const start = parseISO(startISO);
+  const end = endISO ? parseISO(endISO) : null;
+
+  // Start
+  const startCell = allDays.find(c => c.dataset.date === startISO);
+  if (startCell) startCell.classList.add("sel-start");
+
+  if (!end) return;
+
+  // End
+  const endCell = allDays.find(c => c.dataset.date === endISO);
+  if (endCell) endCell.classList.add("sel-end");
+
+  // In-Range
+  const [from, to] = start <= end ? [start, end] : [end, start];
+  allDays.forEach(c => {
+    const d = parseISO(c.dataset.date);
+    if (d > from && d < to) c.classList.add("sel-inrange");
+  });
+}
+
+function setMessage(msg, type="info") {
+  const el = document.getElementById("selection-message");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.classList.remove("error", "info");
+  el.classList.add(type);
+}
+
+// -- Formular-Felder befüllen --
+function fillForm(arrivalISO, departureISO) {
+  const inArrival = document.querySelector('input[name="arrival"]');
+  const inDeparture = document.querySelector('input[name="departure"]');
+  if (!inArrival || !inDeparture) return;
+  inArrival.value = arrivalISO || "";
+  inDeparture.value = departureISO || "";
+}
+
+// -- Hauptlogik --
 (async function init(){
   const blocks = await loadBlocked();
   const container = document.getElementById("calendar");
 
+  // Monate rendern (rollend 18 Monate)
   const today = new Date();
-  const months = 18; // rollend 12 Monate anzeigen
-
+  const months = 18;
+  const handleClick = (iso) => onDayClick(iso, blocks);
   for (let i = 0; i < months; i++) {
     const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-    renderMonth(container, d.getFullYear(), d.getMonth(), blocks);
+    renderMonth(container, d.getFullYear(), d.getMonth(), blocks, handleClick);
   }
 
-  // --- Sanfte Sichtbarkeits-Animation der Monatsblöcke ---
+  // Sichtbarkeits-Animation
   const monthsEls = document.querySelectorAll('.month');
   if (!('IntersectionObserver' in window) || monthsEls.length === 0) {
     monthsEls.forEach(m => m.classList.add('is-visible'));
-    return;
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    monthsEls.forEach(m => io.observe(m));
   }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('is-visible');
-        io.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
 
-  monthsEls.forEach(m => io.observe(m));
+  // Auswahl-Status
+  let startISO = null;
+  let endISO = null;
+
+  // Reset-Button (optional vorhanden)
+  const resetBtn = document.getElementById("resetSelection");
+  if (resetBtn) resetBtn.addEventListener("click", () => {
+    startISO = null; endISO = null;
+    clearSelectionVisual();
+    fillForm("", "");
+    setMessage(LANG==="de-DE" ? "Bitte Anreisetag wählen." : "Please select check-in date.", "info");
+  });
+
+  // Start-Hinweis
+  setMessage(LANG==="de-DE" ? "Bitte Anreisetag wählen." : "Please select check-in date.", "info");
+
+  // Klick-Handler
+  function onDayClick(iso, blocks) {
+    const clicked = parseISO(iso);
+
+    // Wenn noch kein Start gewählt: setze Start
+    if (!startISO || (startISO && endISO)) {
+      startISO = iso;
+      endISO = null;
+      applySelectionVisual(startISO, null);
+      fillForm(startISO, "");
+      setMessage(LANG==="de-DE"
+        ? "Anreise gewählt. Bitte Abreisetag wählen (mind. " + MIN_NIGHTS + " Nächte)."
+        : "Check-in chosen. Please pick check-out (min " + MIN_NIGHTS + " nights).", "info");
+      return;
+    }
+
+    // Wenn Start vorhanden, Ende noch nicht -> prüfen
+    const start = parseISO(startISO);
+    if (clicked <= start) {
+      // Wenn vor Start geklickt wurde, starte neue Auswahl
+      startISO = iso;
+      endISO = null;
+      applySelectionVisual(startISO, null);
+      fillForm(startISO, "");
+      setMessage(LANG==="de-DE"
+        ? "Anreise geändert. Bitte Abreisetag wählen (mind. " + MIN_NIGHTS + " Nächte)."
+        : "Check-in changed. Please select check-out (min " + MIN_NIGHTS + " nights).", "info");
+      return;
+    }
+
+    // Mindestnächte prüfen
+    const nights = daysDiff(start, clicked);
+    if (nights < MIN_NIGHTS) {
+      setMessage(
+        LANG==="de-DE"
+          ? `Mindestens ${MIN_NIGHTS} Nächte. Bitte ein späteres Abreisedatum wählen.`
+          : `Minimum ${MIN_NIGHTS} nights. Please choose a later check-out.`,
+        "error"
+      );
+      return;
+    }
+
+    // Blockaden auf dem Pfad prüfen
+    if (pathHasBlocked(start, clicked, blocks)) {
+      setMessage(
+        LANG==="de-DE"
+          ? "Dieser Zeitraum enthält belegte Tage. Bitte anderen Abreisetag wählen."
+          : "This range includes booked days. Please choose a different check-out.",
+        "error"
+      );
+      return;
+    }
+
+    // Alles ok -> Ende setzen
+    endISO = iso;
+    applySelectionVisual(startISO, endISO);
+    fillForm(startISO, endISO);
+    setMessage(
+      LANG==="de-DE"
+        ? `Auswahl: ${startISO} bis ${endISO} (${nights} Nächte).`
+        : `Selected: ${startISO} to ${endISO} (${nights} nights).`,
+      "info"
+    );
+
+    // Zum Formular scrollen (komfort)
+    const form = document.querySelector("form");
+    if (form && form.scrollIntoView) {
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 })();
-
