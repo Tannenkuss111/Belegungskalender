@@ -59,7 +59,7 @@ function renderMonth(container, year, month, blocks) {
   const container = document.getElementById("calendar");
 
   const today = new Date();
-  const months = 12;
+  const months = 18;
 
   for (let i = 0; i < months; i++) {
     const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
@@ -83,3 +83,4 @@ function renderMonth(container, year, month, blocks) {
 
   monthsEls.forEach(m => io.observe(m));
 })();
+
