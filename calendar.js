@@ -18,7 +18,7 @@ function enumerateDates(start,end){ const out=[]; let cur=new Date(start.getFull
 
 // Blocked-Ranges laden (immer frisch, mit Cache-Bust)
 async function loadBlocked() {
-  const res = await fetch("blocked.json?v=6", { cache: "no-store" });
+  const res = await fetch("blocked.json?v=7", { cache: "no-store" });
   const data = await res.json(); // { ranges: [{start,end}, ...] }
   return data.ranges.map(r => [parseISO(r.start), parseISO(r.end)]);
 }
@@ -128,9 +128,9 @@ function fillForm(arrivalISO, departureISO) {
   const blocks = await loadBlocked();
   const container = document.getElementById("calendar");
 
-  // Monate rendern (rollend 12)
+  // Monate rendern (rollend 18)
   const today = new Date();
-  const months = 12;
+  const months = 18;
   const handleClick = (iso) => onDayClick(iso, blocks);
   for (let i = 0; i < months; i++) {
     const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
