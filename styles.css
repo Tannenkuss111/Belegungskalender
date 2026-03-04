@@ -53,6 +53,10 @@ h1 {
   border-left: 5px solid var(--gold);
   box-shadow: 0 2px 10px rgba(13,61,40,.12);
 }
+.notice strong {
+  color: var(--gold);
+  font-weight: 700;
+}
 
 /* ===== Logo / Brand ===== */
 .brand {
