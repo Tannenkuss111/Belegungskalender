@@ -6,9 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ferienwohnung TANNENKUSS111 – Belegungskalender & Anfrage</title>
   <meta name="description" content="Belegungskalender & Anfrageformular der Ferienwohnung TANNENKUSS111 im Ferienpark Hahnenklee (Goslar). Verfügbarkeit prüfen & direkt anfragen.">
-  <link rel="stylesheet" href="styles.css?v=5">
-  <link rel="canonical" href="https://tannenkuss111.github.io/Belegungskalender">
+  https://tannenkuss111.github.io/Belegungskalender
   <meta name="robots" content="index,follow">
+
+  <!-- Favicon & App-Icon (vorerst JPG; später gern PNG/ICO) -->
+  tkus111.jpg?v=6
+  tkus111.jpg?v=6
+
+  <!-- Immer aktuelle CSS laden -->
+  styles.css?v=6
 </head>
 
 <body>
@@ -16,7 +22,7 @@
 
     <!-- Logo oben -->
     <div class="brand">
-      <img src="tkus111.jpg?v=5" alt="TANNENKUSS111 – Ferienpark Hahnenklee" loading="lazy">
+      tkus111.jpg?v=6
     </div>
 
     <h1>Ferienwohnung TANNENKUSS111</h1>
@@ -27,6 +33,9 @@
       🟩 Grün = frei — 🟥 Rot = belegt &nbsp; • &nbsp; <strong>2 Nächte Mindestaufenthalt</strong><br>
       Green = available — Red = booked &nbsp; • &nbsp; <strong>2 nights minimum stay</strong>
     </div>
+
+    <!-- „Zum aktuellen Monat“ -->
+    <p class="jump"><a id="jumpCurrent" href="#">Zum aktuellen Monat springen</a></p>
 
     <!-- Auswahl-Status (wird per JS gefüllt) -->
     <div id="selection-message" class="info" aria-live="polite"></div>
@@ -49,7 +58,7 @@
 
     <!-- Anfrageformular -->
     <h2 style="margin-top:28px;">Anfrage senden – Send Inquiry</h2>
-    <form action="https://formsubmit.co/play8282@gmx.de" method="POST">
+    https://formsubmit.co/play8282@gmx.de
       <label for="name">Name / Name</label>
       <input id="name" type="text" name="name" required>
 
@@ -69,7 +78,6 @@
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_subject" value="Anfrage über Belegungskalender – TANNENKUSS111">
       <input type="hidden" name="_template" value="box">
-      <!-- Nach Absenden kann auf dieselbe Seite zurückgeleitet werden -->
       <input type="hidden" name="_next" value="https://tannenkuss111.github.io/Belegungskalender">
       <!-- Honeypot (Spam-Schutz) -->
       <input type="text" name="_honey" style="display:none">
@@ -81,13 +89,11 @@
     <h2 style="margin-top:28px;">QR‑Code</h2>
     <div class="qr-section">
       <div class="qr-img">
-        <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender"
-          width="250" height="250" alt="QR‑Code zum Belegungskalender" loading="lazy">
+        https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender
       </div>
 
       <div class="qr-info">
-        <img class="logo-small" src="tkus111.jpg?v=5" alt="Logo TANNENKUSS111" loading="lazy">
+        tkus111.jpg?v=6
         <p class="address" aria-label="Adresse">
           <strong>Ferienpark Hahnenklee</strong><br>
           Tannenkuss111<br>
@@ -100,6 +106,6 @@
   </main>
 
   <!-- Immer aktuelles JS laden -->
-  <script src="calendar.js?v=5"></script>
+  calendar.js?v=6</script>
 </body>
 </html>
