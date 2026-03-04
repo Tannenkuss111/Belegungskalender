@@ -1,289 +1,252 @@
 
-// Sprache automatisch (DE/EN)
-const LANG = navigator.language && navigator.language.startsWith("de") ? "de-DE" : "en-US";
-const WEEKDAYS = LANG === "de-DE"
-  ? ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-  : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-// Einstellungen
-const MIN_NIGHTS = 2;
-
-// Hilfsfunktionen
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const pad2 = (n) => String(n).padStart(2, "0");
-const toISO = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-function parseISO(iso) {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-function daysDiff(a, b) {
-  const a0 = new Date(a.getFullYear(), a.getMonth(), a.getDate());
-  const b0 = new Date(b.getFullYear(), b.getMonth(), b.getDate());
-  return Math.round((b0 - a0) / MS_PER_DAY);
-}
-function enumerateDates(start, end) {
-  const out = [];
-  let cur = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-  while (cur <= last) {
-    out.push(new Date(cur));
-    cur.setDate(cur.getDate() + 1);
-  }
-  return out;
+:root {
+  --accent: #0d3d28;        /* Dunkelgrün */
+  --accent-light: #145c3a;
+  --gold: #d4af37;          /* Gold */
+  --blocked: #b33a3a;
+  --free: #e9f7ef;
+  --bg: #f3f3f3;
 }
 
-// Blocked-Ranges laden – IMMER FRISCH, ohne manuelles v=
-// -> Du änderst künftig nur noch blocked.json, sonst nichts.
-async function loadBlocked() {
-  // Millisekunden-genauer Cache-Bust für sofortige Aktualisierung
-  const bust = Date.now();
-  try {
-    const res = await fetch(`blocked.json?_=${bust}`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json(); // { ranges: [{start, end}, ...] }
-    return data.ranges.map(r => [parseISO(r.start), parseISO(r.end)]);
-  } catch (err) {
-    console.error("blocked.json konnte nicht geladen werden:", err);
-    return []; // lieber leere Belegungen anzeigen, als abbrechen
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+  color: #222;
 }
 
-function isBlocked(date, blocks) {
-  return blocks.some(([s, e]) => date >= s && date <= e);
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,.1);
+  border: 2px solid var(--accent);
 }
 
-function pathHasBlocked(start, end, blocks) {
-  return enumerateDates(start, end).some(d => isBlocked(d, blocks));
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+  color: var(--accent);
 }
 
-// Rendering eines Monats
-function renderMonth(container, year, month, blocks, onDayClick) {
-  const section = document.createElement("section");
-  section.className = "month";
-  section.id = `${year}-${pad2(month + 1)}`; // für evtl. Sprung-Link
-
-  const title = document.createElement("h2");
-  title.textContent = new Date(year, month).toLocaleString(LANG, {
-    month: "long", year: "numeric"
-  });
-  section.appendChild(title);
-
-  const grid = document.createElement("div");
-  grid.className = "calendar-grid";
-
-  WEEKDAYS.forEach(w => {
-    const wd = document.createElement("div");
-    wd.className = "weekday";
-    wd.textContent = w;
-    grid.appendChild(wd);
-  });
-
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
-  const offset = (first.getDay() + 6) % 7; // Montag=0
-
-  for (let i = 0; i < offset; i++) grid.appendChild(document.createElement("div"));
-
-  for (let d = 1; d <= last.getDate(); d++) {
-    const date = new Date(year, month, d);
-    const cell = document.createElement("div");
-    const blocked = isBlocked(date, blocks);
-    cell.className = "day " + (blocked ? "blocked" : "free");
-    cell.textContent = d;
-    cell.dataset.date = toISO(date);
-
-    if (!blocked) {
-      cell.tabIndex = 0;
-      cell.setAttribute("role", "button");
-      cell.setAttribute("aria-label", (LANG === "de-DE" ? "Datum auswählen " : "Select date ") + cell.dataset.date);
-      cell.addEventListener("click", () => onDayClick(cell.dataset.date));
-      cell.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onDayClick(cell.dataset.date);
-        }
-      });
-    } else {
-      cell.setAttribute("aria-disabled", "true");
-    }
-    grid.appendChild(cell);
-  }
-
-  section.appendChild(grid);
-  container.appendChild(section);
+.subtitle {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: var(--accent-light);
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-// Auswahl-Visualisierung
-function clearSelectionVisual() {
-  document.querySelectorAll(".day.sel-start, .day.sel-end, .day.sel-inrange").forEach(el => {
-    el.classList.remove("sel-start", "sel-end", "sel-inrange");
-    el.removeAttribute("data-badge");
-  });
+/* Hinweisbox */
+.notice {
+  background: var(--accent);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 1rem;
+  border-left: 5px solid var(--gold);
+  box-shadow: 0 2px 10px rgba(13,61,40,.12);
+}
+.notice strong {
+  color: var(--gold);
+  font-weight: 700;
 }
 
-function applySelectionVisual(startISO, endISO) {
-  clearSelectionVisual();
-  if (!startISO) return;
+/* Zum aktuellen Monat springen */
+.jump {
+  text-align: center;
+  margin: 8px 0 14px;
+}
+.jump a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 2px;
+}
+.jump a:hover { color: var(--accent-light); }
 
-  const allDays = Array.from(document.querySelectorAll(".day.free, .day.blocked"));
-  const start = parseISO(startISO);
-  const end = endISO ? parseISO(endISO) : null;
-
-  const startCell = allDays.find(c => c.dataset.date === startISO);
-  if (startCell) {
-    startCell.classList.add("sel-start");
-    startCell.setAttribute("data-badge", LANG === "de-DE" ? "A" : "CI"); // A=Anreise / CI=Check‑in
-  }
-
-  if (!end) return;
-
-  const endCell = allDays.find(c => c.dataset.date === endISO);
-  if (endCell) {
-    endCell.classList.add("sel-end");
-    endCell.setAttribute("data-badge", LANG === "de-DE" ? "E" : "CO"); // E=Ende / CO=Check‑out
-  }
-
-  const [from, to] = start <= end ? [start, end] : [end, start];
-  allDays.forEach(c => {
-    const d = parseISO(c.dataset.date);
-    if (d > from && d < to) c.classList.add("sel-inrange");
-  });
+/* ===== Logo / Brand ===== */
+.brand {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 10px;
+}
+.brand img {
+  max-width: 340px;
+  width: 90%;
+  height: auto;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+  animation: fadeInDown .8s ease-out forwards;
+  opacity: 0;
 }
 
-function setMessage(msg, type = "info") {
-  const el = document.getElementById("selection-message");
-  if (!el) return;
-  el.textContent = msg || "";
-  el.classList.remove("error", "info");
-  el.classList.add(type);
+/* Kalender */
+.month {
+  margin: 20px 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.month h2 {
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+.month.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-function fillForm(arrivalISO, departureISO) {
-  const inArrival = document.querySelector('input[name="arrival"]');
-  const inDeparture = document.querySelector('input[name="departure"]');
-  if (!inArrival || !inDeparture) return;
-  inArrival.value = arrivalISO || "";
-  inDeparture.value = departureISO || "";
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
 }
 
-// Hauptlogik
-(async function init() {
-  const blocks = await loadBlocked();
-  const container = document.getElementById("calendar");
+.weekday, .day {
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.day { position: relative; }   /* für Badge-Positionierung */
 
-  // Monate rendern (rollend 12)
-  const today = new Date();
-  const months = 12;
-  const handleClick = (iso) => onDayClick(iso, blocks);
+.weekday {
+  background: #eee;
+  font-weight: bold;
+}
 
-  for (let i = 0; i < months; i++) {
-    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
-    renderMonth(container, d.getFullYear(), d.getMonth(), blocks, handleClick);
-  }
+.day.free {
+  background: var(--free);
+  border: 1px solid #b8d7c0;
+  cursor: pointer;
+}
+.day.free:hover { filter: brightness(0.98); }
 
-  // Sanfte Sichtbarkeits-Animation
-  const monthsEls = document.querySelectorAll('.month');
-  if (!('IntersectionObserver' in window) || monthsEls.length === 0) {
-    monthsEls.forEach(m => m.classList.add('is-visible'));
-  } else {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-visible');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    monthsEls.forEach(m => io.observe(m));
-  }
+/* Markierungen für Auswahl */
+.day.sel-start,
+.day.sel-end {
+  outline: 2px solid var(--gold);
+  box-shadow: 0 0 0 2px var(--gold) inset;
+}
+.day.sel-inrange {
+  background: #dff0e5;
+  border-color: #9cc7a8 !important;
+}
 
-  // Auswahlstatus
-  let startISO = null;
-  let endISO = null;
+/* Badges für An-/Abreise */
+.day.sel-start::after,
+.day.sel-end::after {
+  content: attr(data-badge);
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background: var(--gold);
+  color: #222;
+  font-weight: 700;
+  font-size: 0.7rem;
+  padding: 1px 4px;
+  border-radius: 10px;
+}
 
-  // Reset-Button (falls vorhanden)
-  const resetBtn = document.getElementById("resetSelection");
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
-      startISO = null; endISO = null;
-      clearSelectionVisual();
-      fillForm("", "");
-      setMessage(LANG === "de-DE" ? "Bitte Anreisetag wählen." : "Please select check-in date.", "info");
-    });
-  }
+/* Blockierte Tage */
+.day.blocked {
+  background: var(--blocked);
+  color: white;
+}
 
-  // Start-Hinweis
-  setMessage(LANG === "de-DE" ? "Bitte Anreisetag wählen." : "Please select check-in date.", "info");
+/* Legende */
+.legend {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.legend span {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+.legend .free { background: var(--free); border: 1px solid #b8d7c0; }
+.legend .blocked { background: var(--blocked); }
 
-  // Klick-Handler
-  function onDayClick(iso, blocks) {
-    const clicked = parseISO(iso);
+/* Formular */
+form {
+  background: #fff;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 25px;
+}
+form label { font-weight: bold; }
+form input, form textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
 
-    // Falls keine Auswahl oder bereits abgeschlossen -> Start neu setzen
-    if (!startISO || (startISO && endISO)) {
-      startISO = iso; endISO = null;
-      applySelectionVisual(startISO, null);
-      fillForm(startISO, "");
-      setMessage(
-        LANG === "de-DE"
-          ? `Anreise gewählt. Bitte Abreisetag wählen (mind. ${MIN_NIGHTS} Nächte).`
-          : `Check-in chosen. Please pick check-out (min ${MIN_NIGHTS} nights).`,
-        "info"
-      );
-      return;
-    }
+/* Button */
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid var(--gold);
+  transition: transform .12s ease, box-shadow .12s ease, background .15s;
+}
+button:hover {
+  background: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
 
-    const start = parseISO(startISO);
-    if (clicked <= start) {
-      // Vor Start geklickt -> Auswahl neu beginnen
-      startISO = iso; endISO = null;
-      applySelectionVisual(startISO, null);
-      fillForm(startISO, "");
-      setMessage(
-        LANG === "de-DE"
-          ? `Anreise geändert. Bitte Abreisetag wählen (mind. ${MIN_NIGHTS} Nächte).`
-          : `Check-in changed. Please select check-out (min ${MIN_NIGHTS} nights).`,
-        "info"
-      );
-      return;
-    }
+/* QR + Logo + Adresse nebeneinander */
+.qr-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.qr-img img {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  background: #fff;
+}
+.qr-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 260px;
+}
+.logo-small {
+  max-width: 140px;
+  height: auto;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.08));
+  border-radius: 6px;
+}
+.address {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.98rem;
+  color: #222;
+}
 
-    const nights = daysDiff(start, clicked);
-    if (nights < MIN_NIGHTS) {
-      setMessage(
-        LANG === "de-DE"
-          ? `Mindestens ${MIN_NIGHTS} Nächte. Bitte ein späteres Abreisedatum wählen.`
-          : `Minimum ${MIN_NIGHTS} nights. Please choose a later check-out.`,
-        "error"
-      );
-      return;
-    }
-
-    if (pathHasBlocked(start, clicked, blocks)) {
-      setMessage(
-        LANG === "de-DE"
-          ? "Dieser Zeitraum enthält belegte Tage. Bitte anderen Abreisetag wählen."
-          : "This range includes booked days. Please choose a different check-out.",
-        "error"
-      );
-      return;
-    }
-
-    // Alles ok -> Ende setzen
-    endISO = iso;
-    applySelectionVisual(startISO, endISO);
-    fillForm(startISO, endISO);
-    setMessage(
-      LANG === "de-DE"
-        ? `Auswahl: ${startISO} bis ${endISO} (${nights} Nächte).`
-        : `Selected: ${startISO} to ${endISO} (${nights} nights).`,
-      "info"
-    );
-
-    // Komfort: zum Formular scrollen
-    const form = document.querySelector("form");
-    if (form && form.scrollIntoView) {
-      form.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-})();
+/* Animationen */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
