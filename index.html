@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TANNENKUSS111 – Belegungskalender</title>
   <meta name="description" content="Ferienwohnung TANNENKUSS111 – Belegungskalender / Availability Calendar, Ferienpark Hahnenklee">
-  <link rel="stylesheet" href="styles.css">
+  <!-- Immer aktuelle CSS laden -->
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 
 <body>
@@ -14,16 +15,16 @@
 
     <!-- Logo -->
     <div class="brand">
-      <img src="tkus111.jpg" alt="Tannenkuss111 – Ferienpark Hahnenklee" loading="lazy">
+      <img src="tkus111.jpg?v=3" alt="TANNENKUSS111 – Ferienpark Hahnenklee" loading="lazy">
     </div>
 
     <h1>Ferienwohnung TANNENKUSS111</h1>
     <p class="subtitle">Belegungskalender – Availability Calendar</p>
 
-    <!-- Hinweisbox -->
+    <!-- Hinweisbox mit Mindestaufenthalt -->
     <div class="notice">
-      🟩 Grün = frei — 🟥 Rot = belegt<br>
-      Green = available — Red = booked
+      🟩 Grün = frei — 🟥 Rot = belegt &nbsp; • &nbsp; <strong>2 Nächte Mindestaufenthalt</strong><br>
+      Green = available — Red = booked &nbsp; • &nbsp; <strong>2 nights minimum stay</strong>
     </div>
 
     <!-- Kalender -->
@@ -52,10 +53,12 @@
       <label>Nachricht / Message</label>
       <textarea name="message" rows="4"></textarea>
 
-      <!-- FormSubmit Optionen -->
+      <!-- FormSubmit-Optionen -->
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_subject" value="Anfrage über Belegungskalender – TANNENKUSS111">
       <input type="hidden" name="_template" value="box">
+      <!-- Honeypot -->
+      <input type="text" name="_honey" style="display:none">
 
       <button type="submit">Absenden / Send</button>
     </form>
@@ -63,11 +66,12 @@
     <!-- QR-Code -->
     <h2>QR‑Code</h2>
     <img
-      src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://tannenkuss111.github.io/Belegungskalender"
-      alt="QR-Code Belegungskalender"
-      width="250" height="250">
+      src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender"
+      alt="QR-Code zum Belegungskalender"
+      width="250" height="250" loading="lazy">
   </main>
 
-  <script src="calendar.js"></script>
+  <!-- Immer aktuelles JS laden -->
+  <script src="calendar.js?v=3"></script>
 </body>
 </html>
