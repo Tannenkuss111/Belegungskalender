@@ -9,11 +9,11 @@
   <meta name="robots" content="index,follow">
 
   <!-- Favicon & App-Icon (vorerst JPG; später gern PNG/ICO) -->
-  tkus111.jpg?v=7
-  tkus111.jpg?v=7
+  <link rel="icon" href="tkus111.jpg?v=8" type="image/jpeg">
+  <link rel="apple-touch-icon" href="tkus111.jpg?v=8">
 
-  <!-- Immer aktuelle CSS laden -->
-  styles.css?v=7
+  <!-- Styles laden -->
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 
 <body>
@@ -21,7 +21,7 @@
 
     <!-- Logo oben -->
     <div class="brand">
-      tkus111.jpg?v=7
+      <img src="tkus111.jpg?v=8" alt="TANNENKUSS111 – Logo" loading="lazy">
     </div>
 
     <h1>Ferienwohnung TANNENKUSS111</h1>
@@ -34,7 +34,9 @@
     </div>
 
     <!-- „Zum aktuellen Monat“ -->
-    <p class="jump">#Zum aktuellen Monat springen</a></p>
+    <p class="jump">
+      <a id="jumpCurrent" href="#top">Zum aktuellen Monat springen</a>
+    </p>
 
     <!-- Auswahl-Status (wird per JS gefüllt) -->
     <div id="selection-message" class="info" aria-live="polite"></div>
@@ -57,7 +59,7 @@
 
     <!-- Anfrageformular -->
     <h2 style="margin-top:28px;">Anfrage senden – Send Inquiry</h2>
-    https://formsubmit.co/play8282@gmx.de
+    <form action="https://formsubmit.co/play8282@gmx.de" method="POST">
       <label for="name">Name / Name</label>
       <input id="name" type="text" name="name" required>
 
@@ -88,11 +90,14 @@
     <h2 style="margin-top:28px;">QR‑Code</h2>
     <div class="qr-section">
       <div class="qr-img">
-        https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https%3A%2F%2Ftannenkuss111.github.io%2FBelegungskalender"
+          alt="QR‑Code zum Belegungskalender"
+          width="250" height="250" loading="lazy">
       </div>
 
       <div class="qr-info">
-        tkus111.jpg?v=7
+        <img class="logo-small" src="tkus111.jpg?v=8" alt="TANNENKUSS111 – Logo klein" loading="lazy">
         <p class="address" aria-label="Adresse">
           <strong>Ferienpark Hahnenklee</strong><br>
           Tannenkuss111<br>
@@ -104,7 +109,7 @@
 
   </main>
 
-  <!-- Immer aktuelles JS laden -->
-  calendar.js?v=7</script>
+  <!-- Skript laden -->
+  <script src="calendar.js?v=8" defer></script>
 </body>
 </html>
